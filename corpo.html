@@ -3,307 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jogo do Sorvete da My Melody</title>
+    <title>Sanrio Neapolitan Game</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&family=Comfortaa:wght@700&display=swap" rel="stylesheet">
 
     <style>
-        /* Cores do Napolitano Pastel:
-           Morango: #ffcad4 (Rosa)
-           Baunilha: #fbf8cc (Creme)
-           Chocolate: #ddb892 (Marrom claro)
-           Fundo: #f8edeb (Suavíssimo)
-        */
+        :root {
+            --morango: #ffcad4;
+            --baunilha: #fbf8cc;
+            --chocolate: #ddb892;
+            --bg: #fff5f7;
+            --borda: #ff9aa2;
+        }
 
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f8edeb;
             margin: 0;
+            padding: 0;
+            height: 100vh;
+            background-color: var(--bg);
             font-family: "Fredoka", sans-serif;
-            overflow: hidden; /* Impede barras de rolagem no jogo */
-            user-select: none;
-        }
-
-        /* Tela Inicial com o Botão */
-        #screen-start {
+            overflow: hidden;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            position: absolute;
-            z-index: 10;
+            justify-content: center;
         }
 
-        .btn-start {
-            display: inline-block;
-            text-decoration: none;
-            background-color: #ffcad4; /* Rosa Morango */
-            color: white;
-            font-size: 28px;
+        /* --- Interface Inicial --- */
+        #ui-container {
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .btn {
+            font-family: "Comfortaa", sans-serif;
+            font-size: 24px;
             font-weight: 700;
-            padding: 14px 45px;
-            border: 3px solid #fbf8cc;
+            color: white;
+            padding: 15px 40px;
             border-radius: 50px;
+            border: 4px solid var(--baunilha);
             cursor: pointer;
-            box-shadow: 0 8px 0px #ffb7b2;
+            box-shadow: 0 8px 0px var(--borda);
             transition: all 0.1s ease;
-            outline: none;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-            letter-spacing: 1px;
         }
 
-        .btn-start:hover {
-            background-color: #ffb7b2;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 0px #ff9aa2;
+        .btn-start { background-color: var(--morango); }
+        .btn-char { background-color: var(--chocolate); }
+
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 0px var(--borda); }
+        .btn:active { transform: translateY(6px); box-shadow: 0 2px 0px var(--borda); }
+
+        /* --- Seletor de Personagem (Modal) --- */
+        #char-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 40px;
+            border: 8px solid var(--morango);
+            z-index: 200;
+            width: 80%;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
         }
 
-        .btn-start:active {
-            transform: translateY(8px);
-            box-shadow: 0 0px 0px #ff9aa2;
+        .char-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
         }
 
-        /* Área do Jogo (Escondida no início) */
-        #game-container {
+        .char-card {
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 20px;
+            transition: background 0.3s;
+        }
+
+        .char-card:hover { background: var(--bg); }
+        .char-card img { width: 80px; height: 80px; object-fit: contain; }
+        .char-card p { margin: 5px 0 0; font-size: 14px; color: var(--chocolate); }
+
+        /* --- O Jogo --- */
+        #game-area {
             display: none;
             position: relative;
             width: 100vw;
             height: 100vh;
-            background-color: #f8edeb;
         }
 
-        /* Placar */
-        #score-board {
+        #score {
             position: absolute;
             top: 20px;
             left: 20px;
-            font-size: 24px;
-            color: #ddb892; /* Marrom chocolate */
-            background: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            box-shadow: 0 4px 0 #e6ccb2;
+            font-size: 32px;
+            color: var(--chocolate);
         }
 
-        /* My Melody com a Casquinha */
+        /* --- Jogador --- */
         #player {
             position: absolute;
-            bottom: 20px;
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            width: 100px;
-            height: 120px;
+            width: 180px; /* BEM MAIOR como pedido */
+            height: 220px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-end;
-            pointer-events: none;
+            transition: left 0.1s ease-out;
         }
 
-        /* Representação fofa da My Melody (um círculo rosa com orelhinhas) */
-        .melody-sprite {
-            width: 70px;
-            height: 60px;
-            background-color: #ffcad4; /* Capuz rosa */
-            border-radius: 50% 50% 40% 40%;
-            position: relative;
-            box-shadow: inset -4px -4px 0px rgba(0,0,0,0.05);
+        #player-sprite {
+            width: 140px;
+            height: 140px;
+            object-fit: contain;
+            z-index: 2;
         }
 
-        /* Orelhas da My Melody */
-        .melody-sprite::before, .melody-sprite::after {
-            content: '';
-            position: absolute;
-            top: -25px;
-            width: 22px;
-            height: 40px;
-            background-color: #ffcad4;
-            border-radius: 50% 50% 0 0;
-        }
-        .melody-sprite::before { left: 8px; transform: rotate(-10deg); }
-        .melody-sprite::after { right: 8px; transform: rotate(10deg); }
-
-        /* Rostinho */
-        .melody-face {
-            position: absolute;
-            bottom: 5px;
-            left: 13px;
-            width: 44px;
-            height: 35px;
-            background-color: #fff;
-            border-radius: 50%;
-        }
-
-        /* Olhinhos e Nariz */
-        .melody-face::before {
-            content: '•  •';
-            position: absolute;
-            top: 5px;
-            left: 11px;
-            font-size: 14px;
-            color: #4a4a4a;
-            letter-spacing: 2px;
-        }
-        .melody-face::after {
-            content: '';
-            position: absolute;
-            top: 18px;
-            left: 20px;
-            width: 5px;
-            height: 5px;
-            background-color: #ffea00; /* Narizinho amarelo */
-            border-radius: 50%;
-        }
-
-        /* Casquinha de Sorvete que ela segura */
         .cone {
             width: 0;
             height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 35px solid #ddb892; /* Marrom claro da casquinha */
+            border-left: 30px solid transparent;
+            border-right: 30px solid transparent;
+            border-top: 70px solid var(--chocolate);
             position: absolute;
-            top: -20px;
-            z-index: 5;
+            top: 10px; /* Posicionada para a bola cair dentro */
+            z-index: 1;
         }
 
-        /* Bolinhas de Sorvete Caindo */
-        .ice-cream-ball {
+        /* --- Bolas de Sorvete --- */
+        .ice-cream-scoop {
             position: absolute;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            box-shadow: inset -3px -3px 0px rgba(0,0,0,0.08);
+            box-shadow: inset -5px -5px 0px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
 
-    <div id="screen-start">
-        <button class="btn-start" onclick="startGame()">🌸 START 🌸</button>
+    <div id="ui-container">
+        <button class="btn btn-start" onclick="startGame()">🌸 START 🌸</button>
+        <button class="btn btn-char" onclick="toggleModal(true)">✨ PERSONAGEM ✨</button>
     </div>
 
-    <div id="game-container">
-        <div id="score-board">🍦 Pontos: <span id="score">0</span></div>
+    <div id="char-modal">
+        <h2 style="color: var(--morango);">Escolha seu Amigo!</h2>
+        <div class="char-grid" id="char-list">
+            </div>
+        <button class="btn btn-start" style="margin-top: 20px; font-size: 18px;" onclick="toggleModal(false)">Fechar</button>
+    </div>
+
+    <div id="game-area">
+        <div id="score">🍦 Scoops: 0</div>
         <div id="player">
             <div class="cone"></div>
-            <div class="melody-sprite">
-                <div class="melody-face"></div>
-            </div>
+            <img id="player-sprite" src="http://googleusercontent.com/image_collection/image_retrieval/9598121276588556064" alt="Player">
         </div>
     </div>
 
     <script>
-        const startScreen = document.getElementById('screen-start');
-        const gameContainer = document.getElementById('game-container');
-        const player = document.getElementById('player');
-        const scoreDisplay = document.getElementById('score');
-
-        let score = 0;
-        let gameActive = false;
-        let playerX = window.innerWidth / 2;
-        const playerSpeed = 30;
-
-        // Cores do sorvete napolitano
-        const flavors = [
-            '#ffcad4', // Morango (Rosa)
-            '#fbf8cc', // Baunilha (Creme)
-            '#ddb892'  // Chocolate (Marrom)
-        ];
-
-        function startGame() {
-            startScreen.style.display = 'none';
-            gameContainer.style.display = 'block';
-            gameActive = true;
-            score = 0;
-            scoreDisplay.innerText = score;
-
-            // Inicia a chuva de sorvete
-            setInterval(createIceCream, 1000);
-        }
-
-        // Movimentação do mouse ou dedo no celular
-        window.addEventListener('mousemove', (e) => {
-            if (!gameActive) return;
-            playerX = e.clientX;
-            // Limita o movimento dentro da tela
-            if (playerX < 50) playerX = 50;
-            if (playerX > window.innerWidth - 50) playerX = window.innerWidth - 50;
-            player.style.left = playerX + 'px';
-        });
-
-        // Movimentação por setas do teclado (opcional)
-        window.addEventListener('keydown', (e) => {
-            if (!gameActive) return;
-            if (e.key === 'ArrowLeft') {
-                playerX -= playerSpeed;
-            } else if (e.key === 'ArrowRight') {
-                playerX += playerSpeed;
-            }
-            if (playerX < 50) playerX = 50;
-            if (playerX > window.innerWidth - 50) playerX = window.innerWidth - 50;
-            player.style.left = playerX + 'px';
-        });
-
-        function createIceCream() {
-            if (!gameActive) return;
-
-            const ball = document.createElement('div');
-            ball.classList.add('ice-cream-ball');
-            
-            // Escolhe uma cor aleatória do napolitano
-            const randomColor = flavors[Math.floor(Math.random() * flavors.length)];
-            ball.style.backgroundColor = randomColor;
-
-            // Posição x aleatória na tela
-            const randomX = Math.random() * (window.innerWidth - 40);
-            ball.style.left = randomX + 'px';
-            ball.style.top = '-40px';
-
-            gameContainer.appendChild(ball);
-
-            let ballY = -40;
-            const fallSpeed = 3 + Math.random() * 4; // Velocidades levemente diferentes
-
-            function fall() {
-                if (!gameActive) {
-                    ball.remove();
-                    return;
-                }
-
-                ballY += fallSpeed;
-                ball.style.top = ballY + 'px';
-
-                // Verifica colisão com a My Melody / Casquinha
-                const playerRect = player.getBoundingClientRect();
-                const ballRect = ball.getBoundingClientRect();
-
-                if (
-                    ballRect.bottom >= playerRect.top &&
-                    ballRect.right >= playerRect.left &&
-                    ballRect.left <= playerRect.right &&
-                    ballRect.top <= playerRect.bottom
-                ) {
-                    score++;
-                    scoreDisplay.innerText = score;
-                    ball.remove();
-                    return;
-                }
-
-                // Se passar do chão, remove a bolinha
-                if (ballY > window.innerHeight) {
-                    ball.remove();
-                } else {
-                    requestAnimationFrame(fall);
-                }
-            }
-
-            requestAnimationFrame(fall);
-        }
-    </script>
-</body>
-</html>
+        const characters = [
+            { name: "My Melody", img: "http://googleusercontent.com/image_collection/image_retrieval/9598121276588556064" },
+            { name: "Hello Kitty", img: "http://googleusercontent.com/image_collection/image_retrieval/7905342694676110962" },
+            { name: "Kuromi", img: "http://googleusercontent.com/image_collection/image_retrieval/15014079024076539837" },
+            { name: "Cinnamoroll", img: "http://googleusercontent.com/image_collection/image_retrieval/8123277019349994442" },
+            { name: "Pompompurin", img: "http://googleusercontent.com/image_collection/image_retrieval/5726894621156966361" },
+            { name: "Keroppi", img: "http://googleusercontent.com/image_collection/image_retrieval/17781623551896823780" },
+            { name: "Badtz-Maru", img: "http://googleusercontent.com/image_collection/image_retrieval/1318053893009250078" },
+            { name: "Pochacco", img: "http://
