@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Botão Start Fofo</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
+
     <style>
         body {
             display: flex;
@@ -12,16 +17,19 @@
             height: 100vh;
             background-color: #fff5f7; /* Fundo pastel super suave */
             margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Aplicando a nova fonte aqui */
+            font-family: "Fredoka", sans-serif;
         }
 
-        /* Estilo do botão */
+        /* O próprio link agora se comporta e se parece com o botão */
         .btn-start {
+            display: inline-block;
+            text-decoration: none;
             background-color: #ffb7b2; /* Rosa pastel */
             color: white;
-            font-size: 26px;
-            font-weight: bold;
-            padding: 16px 45px;
+            font-size: 28px; /* Aumentei um pouquinho para destacar a fonte */
+            font-weight: 700; /* Deixa a fonte mais gordinha e fofa */
+            padding: 14px 45px;
             border: 3px solid #ffcad4; /* Borda fofinha */
             border-radius: 50px;
             cursor: pointer;
@@ -29,6 +37,7 @@
             transition: all 0.1s ease;
             outline: none;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            letter-spacing: 1px; /* Espaçamento leve entre as letras */
         }
 
         /* Efeito hover (passar o mouse) */
@@ -47,8 +56,8 @@
 </head>
 <body>
 
-    <a href="https://www.google.com" target="_blank" style="text-decoration: none;">
-        <button class="btn-start">🌸 START 🌸</button>
+    <a href="https://www.google.com" target="_blank" class="btn-start">
+        🌸 START 🌸
     </a>
 
 </body>
