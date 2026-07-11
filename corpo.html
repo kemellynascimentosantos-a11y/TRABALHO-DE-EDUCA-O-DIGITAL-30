@@ -185,3 +185,67 @@
             { name: "Keroppi", img: "http://googleusercontent.com/image_collection/image_retrieval/17781623551896823780" },
             { name: "Badtz-Maru", img: "http://googleusercontent.com/image_collection/image_retrieval/1318053893009250078" },
             { name: "Pochacco", img: "http://
+
+JAVASCRIPT
+
+// Personagens
+const characters = [
+    {
+        name: "My Melody",
+        img: "https://upload.wikimedia.org/wikipedia/en/6/6b/My_Melody.png"
+    },
+    {
+        name: "Hello Kitty",
+        img: "https://upload.wikimedia.org/wikipedia/en/0/05/Hello_kitty_character_portrait.png"
+    },
+    {
+        name: "Kuromi",
+        img: "https://upload.wikimedia.org/wikipedia/en/7/72/Kuromi.png"
+    },
+    {
+        name: "Cinnamoroll",
+        img: "https://upload.wikimedia.org/wikipedia/en/3/38/Cinnamoroll.png"
+    }
+];
+
+// Elementos
+const modal = document.getElementById("char-modal");
+const charList = document.getElementById("char-list");
+const playerSprite = document.getElementById("player-sprite");
+const ui = document.getElementById("ui-container");
+const gameArea = document.getElementById("game-area");
+
+// Mostrar ou esconder o modal
+function toggleModal(show) {
+    if (show) {
+        modal.style.display = "block";
+    } else {
+        modal.style.display = "none";
+    }
+}
+
+// Criar os cartões dos personagens
+characters.forEach(character => {
+
+    const card = document.createElement("div");
+    card.className = "char-card";
+
+    card.innerHTML = `
+        <img src="${character.img}">
+        <p>${character.name}</p>
+    `;
+
+    card.onclick = () => {
+        playerSprite.src = character.img;
+        toggleModal(false);
+    };
+
+    charList.appendChild(card);
+
+});
+
+// Iniciar o jogo
+function startGame() {
+    ui.style.display = "none";
+    gameArea.style.display = "block";
+}
